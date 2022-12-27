@@ -4,7 +4,7 @@ import numpy as np
 from PIL import Image
 
 class PIDParser:
-    def parse_folder_npy(dataset_path = '/content/drive/MyDrive/pid_dataset/dataset_p1/DigitizePID_Dataset'):
+    def parse_folder_npy(self, dataset_path = '/content/drive/MyDrive/pid_dataset/dataset_p1/DigitizePID_Dataset'):
 
         dirs = os.walk(dataset_path)
 
@@ -49,7 +49,7 @@ class PIDParser:
                     if os.path.isfile(path+"_lines2.npy"):
                         other_lines = np.load(path+"_lines2.npy", allow_pickle = True)
 
-                    pid = model.Symbol()
+                    pid = model.PID()
                     
                     pid.id = label
                     pid.path = '/content/drive/MyDrive/pid_dataset/dataset_p1/DigitizePID_Dataset/real-life-images/{0}.jpg'.format(label)
