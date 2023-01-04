@@ -6,6 +6,6 @@ This code is related to the article ["YOLOv5 for symbol extraction in P&ID diagr
 
 This repository contains the data for the model. Contributions and questions are welcome.
 
-To train or use the model
+## To train or use the model
 1) Clone the repository
-2) Run the notebook in the respository
+2) Run the notebook "yolov5_p&ids.ipynb" in the respository
