@@ -54,7 +54,12 @@ class PIDParser:
                 return False
 
         return True
-
+    def to_label(self, type:str):
+        if type == 'solid':
+            return 0
+        if type == 'dashed':
+            return 1
+        return 2
     def normalized_coords(self, start_xy: List[float], end_xy: List[float], img_size: List[float]):
         top_x = min(start_xy[0], end_xy[0]) / img_size[0]
         top_y = min(start_xy[1], end_xy[1]) / img_size[1]
@@ -123,7 +128,7 @@ class PIDParser:
                 # line.pid.get_line_crop_by_id(line.line_id).save(img_name)
 
                 next = '{0} {1} {2} {3} {4}'.format(
-                    line.types, *self.normalized_coords(
+                    self.to_label(line.types), *self.normalized_coords(
                         line.start_xy, line.end_xy, [pid.width, pid.height])
                 )
 
