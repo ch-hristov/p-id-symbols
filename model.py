@@ -1,17 +1,11 @@
 from typing import List
 from PIL import Image
 
-class Line:
-    def __init__(self, line_id: str, start_xy: List[float], end_xy: List[float], tag: str, types: str):
-        self.line_id = line_id
-        self.start_xy = start_xy
-        self.types = types
-        self.tag = tag
+
+class VisualObject:
+    def __init__(self, start_xy: List[float], end_xy: List[float]):
         self.start_xy = start_xy
         self.end_xy = end_xy
-
-    def __repr__(self) -> str:
-        return str(self.line_id)
 
 class OtherLine:
     def __init__(self, start_xy: List[float], end_xy: List[float], isOne: int):
@@ -24,11 +18,10 @@ class Table:
     def __init__(self):
         self.lines = []
 
-class Word:
+class Word(VisualObject):
     def __init__(self, word_id: str, start_xy: List[int], end_xy: List[int], text: str, value: int):
+        VisualObject.__init__(self, start_xy, end_xy)
         self.word_id = word_id
-        self.start_xy = start_xy
-        self.end_xy = end_xy
         self.text = text
         self.value = value
 
@@ -70,6 +63,18 @@ class PID:
 
         return output
 
+    def get_line_crop_by_id(self, idx):
+        img = Image.open(self.path)
+        symbol = [ops for ops in self.lines if ops.line_id == idx]
+
+        x, y = symbol[0].start_xy
+        x1, y1 = symbol[0].end_xy
+
+        crop_target = min(x, x1), min(y, y1), max(x, x1) + 1, max(y, y1)+1
+        output = img.crop(crop_target)
+
+        return output
+
     def get_symbol_crop_by_id(self, idx):
         img = Image.open(self.path)
         symbol = [ops for ops in self.symbols if ops.symbol_id == idx]
@@ -95,10 +100,10 @@ class PID:
         return output
 
     def __init__(self):
-        self.symbols = []
-        self.lines = []
-        self.words = []
-        self.table = []
+        self.symbols : List[Symbol] = []
+        self.lines : List[Line] = []
+        self.words : List[Word] = []
+        self.table : Table = []
         self.links = []
         self.details = []
         self.otherLines = []
@@ -123,3 +128,14 @@ class Symbol:
 
     def __repr__(self) -> str:
         return str(self.symbol_id)
+
+class Line(VisualObject):
+    def __init__(self, line_id: str, start_xy: List[float], end_xy: List[float], tag: str, types: str, pid : PID):
+        VisualObject.__init__(self, start_xy, end_xy)
+        self.line_id = line_id
+        self.types = types
+        self.tag = tag
+        self.pid = pid
+
+    def __repr__(self) -> str:
+        return str(self.line_id)
