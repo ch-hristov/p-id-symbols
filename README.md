@@ -5,3 +5,7 @@ This code is related to the article ["YOLOv5 for symbol extraction in P&ID diagr
 ![image](https://user-images.githubusercontent.com/5409106/209433156-dd2e3297-5f7a-4210-ad4b-b5127474e5af.png)
 
 This repository contains the data for the model. Contributions and questions are welcome.
+
+## To train or use the model
+1) Clone the repository
+2) Run the notebook "yolov5_p&ids.ipynb" in the respository
