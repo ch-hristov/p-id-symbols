@@ -1,5 +1,6 @@
 /images
 /labels
+/labels_lines
 /dataset
 /__pycache__
 .DS_Store
