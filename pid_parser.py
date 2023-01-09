@@ -70,11 +70,11 @@ class PIDParser:
         return 2
 
     def normalized_coords(self, start_xy: List[float], end_xy: List[float], img_size: List[float]):
-        top_x = min(start_xy[0]-1, end_xy[0]-1) / img_size[0]
-        top_y = min(start_xy[1]-1, end_xy[1]-1) / img_size[1]
+        top_x = min(start_xy[0], end_xy[0]) / img_size[0]
+        top_y = min(start_xy[1], end_xy[1]) / img_size[1]
 
-        bot_x = max(start_xy[0]+1, end_xy[0]+1) / img_size[0]
-        bot_y = max(start_xy[1]+1, end_xy[1]+1) / img_size[1]
+        bot_x = max(start_xy[0]+3, end_xy[0]+3) / img_size[0]
+        bot_y = max(start_xy[1]+3, end_xy[1]+3) / img_size[1]
 
         width = (bot_x - top_x)
         height = (bot_y - top_y)
@@ -113,13 +113,6 @@ class PIDParser:
                     pass
 
             for line in lines[pid_id]:
-                
-                x_real = line.start_xy[0]
-                y_real = line.start_xy[1]
-
-                #object x,y end
-                x1_real = line.end_xy[0]
-                y1_real = line.end_xy[1]
 
                 #image boundries (start)
                 is_in_img = self.is_in_img(line, [img_x_start, img_y_start], [img_x_end, img_y_end],
