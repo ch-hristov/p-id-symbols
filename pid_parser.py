@@ -69,7 +69,7 @@ class PIDParser:
         return 2
 
     def normalized_coords(self, start_xy: List[float], end_xy: List[float],
-                          img_start: List[float], img_end: List[float],
+                          img_start: List[float],
                           img_size: List[float]):
 
         x_top = start_xy[0] - img_start[0]
@@ -81,8 +81,8 @@ class PIDParser:
         top_x = min(x_top, x_end) / img_size[0]
         top_y = min(y_top, y_end) / img_size[1]
 
-        bot_x = max(x_top+1, x_end+1) / img_size[0]
-        bot_y = max(y_top+1, y_end+1) / img_size[1]
+        bot_x = max(x_top+5, x_end+5) / img_size[0]
+        bot_y = max(y_top+5, y_end+5) / img_size[1]
 
         width = (bot_x - top_x)
         height = (bot_y - top_y)
@@ -146,11 +146,10 @@ class PIDParser:
 
                 next = '{0} {1} {2} {3} {4}'.format(
                     self.to_label(line.types), *self.normalized_coords(
-                                                                        line.start_xy, 
-                                                                        line.end_xy,
-                                                                        [img_x_start, img_y_start],
-                                                                        [img_x_end, img_y_end],
-                                                                        [pid.width, pid.height])
+                        line.start_xy,
+                        line.end_xy,
+                        [img_x_start, img_y_start],
+                        [pid.width, pid.height])
                 )
 
                 if not os.path.isdir(labels_path):
