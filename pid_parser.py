@@ -10,16 +10,22 @@ class PIDParser:
     def is_in_img(self, object: model.VisualObject, img_start_xy: List[float],
                   img_end_xy: List[float], img_size=1280):
 
+        #object x,y start
         x_real = object.start_xy[0]
-        x1_real = object.end_xy[0]
         y_real = object.start_xy[1]
+
+        #object x,y end
+        x1_real = object.end_xy[0]
         y1_real = object.end_xy[1]
 
+        #image boundries (start)
         img_x_start = img_start_xy[0]
         img_x_end = img_end_xy[0]
 
+        # image boundries (end)
         img_y_start = img_start_xy[1]
         img_y_end = img_end_xy[1]
+        
 
         if x_real >= img_x_start and x1_real <= img_x_end and y_real >= img_y_start and y1_real <= img_y_end:
 
@@ -53,19 +59,22 @@ class PIDParser:
             if (y1_img_real >= img_size):
                 return False
 
-        return True
-    def to_label(self, type:str):
+            return True
+        return False
+
+    def to_label(self, type: str):
         if type == 'solid':
             return 0
         if type == 'dashed':
             return 1
         return 2
-    def normalized_coords(self, start_xy: List[float], end_xy: List[float], img_size: List[float]):
-        top_x = min(start_xy[0], end_xy[0]) / img_size[0]
-        top_y = min(start_xy[1], end_xy[1]) / img_size[1]
 
-        bot_x = max(start_xy[0], end_xy[0]+1) / img_size[0]
-        bot_y = max(start_xy[1], end_xy[1]+1) / img_size[0]
+    def normalized_coords(self, start_xy: List[float], end_xy: List[float], img_size: List[float]):
+        top_x = min(start_xy[0]-2, end_xy[0]-2) / img_size[0]
+        top_y = min(start_xy[1]-2, end_xy[1]-2) / img_size[1]
+
+        bot_x = max(start_xy[0]+2, end_xy[0]+2) / img_size[0]
+        bot_y = max(start_xy[1]+2, end_xy[1]+2) / img_size[0]
 
         width = (bot_x - top_x)
         height = (top_y - bot_y)
@@ -109,9 +118,23 @@ class PIDParser:
                     pass
 
             for line in lines[pid_id]:
+                
+                x_real = line.start_xy[0]
+                y_real = line.start_xy[1]
 
-                if not self.is_in_img(line, [img_x_start, img_y_start], [img_x_end, img_y_end],
-                                      img_size=img_size):
+                #object x,y end
+                x1_real = line.end_xy[0]
+                y1_real = line.end_xy[1]
+
+                #image boundries (start)
+                is_in_img = self.is_in_img(line, [img_x_start, img_y_start], [img_x_end, img_y_end],
+                      img_size=img_size)
+
+                # debugstr = 'Checking if {0} is in {1} = {2}'.format([ [x_real, y_real] , [x1_real, y1_real]], 
+                #                                             [[img_x_start, img_y_start], [img_x_end, img_y_end]], is_in_img)
+                # print(debugstr)
+
+                if not is_in_img:
                     continue
 
                 format_img = '.png'
@@ -124,8 +147,6 @@ class PIDParser:
 
                 label_name = os.path.join(labels_path, '{0}{1}'.format(
                     name, format_label))
-
-                # line.pid.get_line_crop_by_id(line.line_id).save(img_name)
 
                 next = '{0} {1} {2} {3} {4}'.format(
                     self.to_label(line.types), *self.normalized_coords(
