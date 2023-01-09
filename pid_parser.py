@@ -10,22 +10,21 @@ class PIDParser:
     def is_in_img(self, object: model.VisualObject, img_start_xy: List[float],
                   img_end_xy: List[float], img_size=1280):
 
-        #object x,y start
+        # object x,y start
         x_real = object.start_xy[0]
         y_real = object.start_xy[1]
 
-        #object x,y end
+        # object x,y end
         x1_real = object.end_xy[0]
         y1_real = object.end_xy[1]
 
-        #image boundries (start)
+        # image boundries (start)
         img_x_start = img_start_xy[0]
         img_x_end = img_end_xy[0]
 
         # image boundries (end)
         img_y_start = img_start_xy[1]
         img_y_end = img_end_xy[1]
-        
 
         if x_real >= img_x_start and x1_real <= img_x_end and y_real >= img_y_start and y1_real <= img_y_end:
 
@@ -69,12 +68,21 @@ class PIDParser:
             return 1
         return 2
 
-    def normalized_coords(self, start_xy: List[float], end_xy: List[float], img_size: List[float]):
-        top_x = min(start_xy[0], end_xy[0]) / img_size[0]
-        top_y = min(start_xy[1], end_xy[1]) / img_size[1]
+    def normalized_coords(self, start_xy: List[float], end_xy: List[float],
+                          img_start: List[float], img_end: List[float],
+                          img_size: List[float]):
 
-        bot_x = max(start_xy[0]+3, end_xy[0]+3) / img_size[0]
-        bot_y = max(start_xy[1]+3, end_xy[1]+3) / img_size[1]
+        x_top = start_xy[0] - img_start[0]
+        y_top = start_xy[1] - img_start[1]
+
+        x_end = end_xy[0] - img_start[0]
+        y_end = end_xy[1] - img_start[1]
+
+        top_x = min(x_top, x_end) / img_size[0]
+        top_y = min(y_top, y_end) / img_size[1]
+
+        bot_x = max(x_top+1, x_end+1) / img_size[0]
+        bot_y = max(y_top+1, y_end+1) / img_size[1]
 
         width = (bot_x - top_x)
         height = (bot_y - top_y)
@@ -114,11 +122,11 @@ class PIDParser:
 
             for line in lines[pid_id]:
 
-                #image boundries (start)
+                # image boundries (start)
                 is_in_img = self.is_in_img(line, [img_x_start, img_y_start], [img_x_end, img_y_end],
-                      img_size=img_size)
+                                           img_size=img_size)
 
-                # debugstr = 'Checking if {0} is in {1} = {2}'.format([ [x_real, y_real] , [x1_real, y1_real]], 
+                # debugstr = 'Checking if {0} is in {1} = {2}'.format([ [x_real, y_real] , [x1_real, y1_real]],
                 #                                             [[img_x_start, img_y_start], [img_x_end, img_y_end]], is_in_img)
                 # print(debugstr)
 
@@ -138,7 +146,11 @@ class PIDParser:
 
                 next = '{0} {1} {2} {3} {4}'.format(
                     self.to_label(line.types), *self.normalized_coords(
-                        line.start_xy, line.end_xy, [pid.width, pid.height])
+                                                                        line.start_xy, 
+                                                                        line.end_xy,
+                                                                        [img_x_start, img_y_start],
+                                                                        [img_x_end, img_y_end],
+                                                                        [pid.width, pid.height])
                 )
 
                 if not os.path.isdir(labels_path):
