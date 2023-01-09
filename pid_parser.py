@@ -70,19 +70,14 @@ class PIDParser:
         return 2
 
     def normalized_coords(self, start_xy: List[float], end_xy: List[float], img_size: List[float]):
-        top_x = min(start_xy[0]-2, end_xy[0]-2) / img_size[0]
-        top_y = min(start_xy[1]-2, end_xy[1]-2) / img_size[1]
+        top_x = min(start_xy[0], end_xy[0]) / img_size[0]
+        top_y = min(start_xy[1], end_xy[1]) / img_size[1]
 
-        bot_x = max(start_xy[0]+2, end_xy[0]+2) / img_size[0]
-        bot_y = max(start_xy[1]+2, end_xy[1]+2) / img_size[0]
+        bot_x = max(start_xy[0]+1, end_xy[0]) / img_size[0]
+        bot_y = max(start_xy[1]+1, end_xy[1]) / img_size[1]
 
         width = (bot_x - top_x)
         height = (top_y - bot_y)
-
-        debug = "Top X: {0}, Top Y: {1}, Bot_X : {2}, Bot_Y: {3}, Width: {4}, Height: {5}".format(
-            top_x, top_y, bot_x, bot_y, width, height)
-
-        # print(debug)
 
         return top_x, top_y, width, height
 
