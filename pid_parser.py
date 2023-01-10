@@ -7,16 +7,17 @@ from PIL import Image
 
 class PIDParser:
 
-    def is_in_img(self, object: model.VisualObject, img_start_xy: List[float],
-                  img_end_xy: List[float], img_size=1280):
+    def is_in_img(self,
+                  object_start: List[float], object_end: List[float],
+                  img_start_xy: List[float], img_end_xy: List[float], img_size=1280):
 
         # object x,y start
-        x_real = object.start_xy[0]
-        y_real = object.start_xy[1]
+        x_real = object_start[0]
+        y_real = object_start[1]
 
         # object x,y end
-        x1_real = object.end_xy[0]
-        y1_real = object.end_xy[1]
+        x1_real = object_end[0]
+        y1_real = object_end[1]
 
         # image boundries (start)
         img_x_start = img_start_xy[0]
@@ -78,21 +79,25 @@ class PIDParser:
         x_end = end_xy[0] - img_start[0]
         y_end = end_xy[1] - img_start[1]
 
-        top_x = min(x_top, x_end) / img_size[0]
-        top_y = min(y_top, y_end) / img_size[1]
+        top_x = x_top
+        top_y = y_top
 
-        bot_x = max(x_top+5, x_end+5) / img_size[0]
-        bot_y = max(y_top+5, y_end+5) / img_size[1]
+        bot_x = x_end
+        bot_y = y_end
 
         width = (bot_x - top_x)
         height = (bot_y - top_y)
 
-        return top_x, top_y, width, height
+        if(width < 0):
+            top_x = bot_x
 
-    def generate_line_labels(self, pid_list: List[model.PID], img_path: str, labels_path: str):
+        if(height < 0):
+            top_y = bot_y
+
+        return top_x, top_y, abs(width), abs(height)
+
+    def generate_line_labels(self, pid_list: List[model.PID], img_path: str, labels_path: str, img_size=1280):
         lines = {}
-        img_size = 1280
-
         all_images = os.listdir("./images")
 
         for pid in pid_list:
@@ -123,7 +128,7 @@ class PIDParser:
             for line in lines[pid_id]:
 
                 # image boundries (start)
-                is_in_img = self.is_in_img(line, [img_x_start, img_y_start], [img_x_end, img_y_end],
+                is_in_img = self.is_in_img(line.start_xy, line.end_xy, [img_x_start, img_y_start], [img_x_end, img_y_end],
                                            img_size=img_size)
 
                 # debugstr = 'Checking if {0} is in {1} = {2}'.format([ [x_real, y_real] , [x1_real, y1_real]],
