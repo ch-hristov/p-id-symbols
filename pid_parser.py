@@ -89,10 +89,10 @@ class PIDParser:
         if (height < 0):
             top_y = bot_y
 
-        if width < 1:
+        if width < 10:
             width = 10
 
-        if height < 1:
+        if height < 10:
             height = 10
 
         return top_x / img_size[0], top_y / img_size[1], abs(width) / img_size[0], abs(height) / img_size[1]
@@ -110,7 +110,7 @@ class PIDParser:
             spl = img.split('_')
             pid_id = spl[0]
             pid_original = [pid for pid in pid_list if pid.id == pid_id][0]
-            
+
             # gather the boundires of the image
             horizontal = float(spl[2].replace('.jpg', ""))
             vertical = float(spl[1])
@@ -178,7 +178,7 @@ class PIDParser:
 
         fig.set_size_inches(30, 30)
         rect = patches.Rectangle((img_x_start, img_y_start), img_y_end - img_y_start, img_x_end-img_x_start,
-                                 fill=None, alpha=1, color = 'red')
+                                 fill=None, alpha=1, color='red')
         ax.add_artist(rect)
         i = 1
         import random
@@ -187,10 +187,10 @@ class PIDParser:
 
         for coord in all_data:
             color = ["#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
-             for i in range(number_of_colors)]
+                     for i in range(number_of_colors)]
 
             rect = patches.Rectangle((coord[0], coord[1]), coord[2]+3-coord[0], coord[3]+3-coord[1],
-                                     linewidth=2, label=coord[4], color = color[0])
+                                     linewidth=2, label=coord[4], color=color[0])
 
             ax.add_artist(rect)
             rx, ry = rect.get_xy()
