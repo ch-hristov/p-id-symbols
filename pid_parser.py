@@ -3,6 +3,8 @@ import model
 import os
 import numpy as np
 from PIL import Image
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 
 class PIDParser:
@@ -88,74 +90,77 @@ class PIDParser:
         width = (bot_x - top_x)
         height = (bot_y - top_y)
 
-        if(width < 0):
+        if (width < 0):
             top_x = bot_x
 
-        if(height < 0):
+        if (height < 0):
             top_y = bot_y
 
-        return top_x, top_y, abs(width), abs(height)
+        if width == 0:
+            width = 1
 
-    def generate_line_labels(self, pid_list: List[model.PID], img_path: str, labels_path: str, img_size=1280):
-        lines = {}
+        if height == 0:
+            height = 1
+
+        return top_x / img_size[0], top_y / img_size[1], abs(width) / img_size[0], abs(height) / img_size[1]
+
+    def generate_line_labels(self,
+                             pid_list: List[model.PID],
+                             img_path: str,
+                             labels_path: str,
+                             visual_objects: dict[str, list[model.VisualObject]],
+                             img_size=1280):
+
         all_images = os.listdir("./images")
-
-        for pid in pid_list:
-            for line in pid.lines:
-                if line.pid.id not in lines:
-                    lines[line.pid.id] = []
-                lines[line.pid.id].append(line)
 
         for img in all_images:
             spl = img.split('_')
             pid_id = spl[0]
 
+            # gather the boundires of the image
             horizontal = float(spl[2].replace('.jpg', ""))
             vertical = float(spl[1])
 
             img_x_start, img_y_start = horizontal, vertical
             img_x_end, img_y_end = horizontal + img_size, vertical + img_size
-
             img_dir = img_path
 
-            if not os.path.isdir(img_dir):
-                try:
-                    os.makedirs(img_dir)
-                except Exception as ex:
-                    print(ex)
-                    pass
+            self.create_dirs(img_dir)
 
-            for line in lines[pid_id]:
-
+            all_data = []
+            for obj in visual_objects[pid_id]:
                 # image boundries (start)
-                is_in_img = self.is_in_img(line.start_xy, line.end_xy, [img_x_start, img_y_start], [img_x_end, img_y_end],
-                                           img_size=img_size)
+                is_in_img_fully = self.is_in_img(obj.start_xy, obj.end_xy,
+                                                 [img_x_start, img_y_start],
+                                                 [img_x_end, img_y_end],
+                                                 img_size=img_size)
 
-                # debugstr = 'Checking if {0} is in {1} = {2}'.format([ [x_real, y_real] , [x1_real, y1_real]],
-                #                                             [[img_x_start, img_y_start], [img_x_end, img_y_end]], is_in_img)
-                # print(debugstr)
-
-                if not is_in_img:
+                if not is_in_img_fully:
                     continue
 
-                format_img = '.png'
                 format_label = '.txt'
 
                 name = os.path.splitext(img)[0]
 
-                img_name = os.path.join(img_dir, '{0}{1}'.format(
-                    pid.id, format_img))
+                # format_img = '.png'
+                # img_name = os.path.join(img_dir, '{0}{1}'.format(
+                #     pid_id, format_img))
 
                 label_name = os.path.join(labels_path, '{0}{1}'.format(
                     name, format_label))
 
                 next = '{0} {1} {2} {3} {4}'.format(
-                    self.to_label(line.types), *self.normalized_coords(
-                        line.start_xy,
-                        line.end_xy,
+                    self.to_label(obj.get_category()),
+                    *self.normalized_coords(
+                        obj.start_xy,
+                        obj.end_xy,
                         [img_x_start, img_y_start],
-                        [pid.width, pid.height])
+                        [img_size, img_size])
                 )
+
+                all_data.append([obj.start_xy[0], obj.start_xy[1],
+                                obj.end_xy[0], obj.end_xy[1],
+                                obj.get_category()])
 
                 if not os.path.isdir(labels_path):
                     os.mkdir(labels_path)
@@ -170,6 +175,37 @@ class PIDParser:
                         file_object.write("\n")
                     # Append text at the end of file
                     file_object.write(next)
+
+            # self.render_samples(pid_original, img_x_start, img_y_start, img_x_end, img_y_end, all_data)
+
+    def render_samples(self, pid_original, img_x_start, img_y_start, img_x_end, img_y_end, all_data):
+        im = Image.open(pid_original.path)
+        fig, ax = plt.subplots()
+
+        fig.set_size_inches(15, 15)
+        rect = patches.Rectangle((img_x_start, img_y_start), img_y_end - img_y_start, img_x_end-img_x_start,
+                                 fill=None, alpha=1)
+        ax.add_artist(rect)
+        for coord in all_data:
+            rect = patches.Rectangle((coord[0], coord[1]), coord[2]+3-coord[0], coord[3]+3-coord[1],
+                                     linewidth=2, label=coord[4])
+
+            ax.add_artist(rect)
+            rx, ry = rect.get_xy()
+            cx = rx + rect.get_width()
+            cy = ry + rect.get_height()
+
+            # ax.annotate(coord[4], (cx, cy), color='blue', weight='bold',
+            #             fontsize=20)
+        ax.imshow(im)
+
+    def create_dirs(self, img_dir):
+        if not os.path.isdir(img_dir):
+            try:
+                os.makedirs(img_dir)
+            except Exception as ex:
+                print(ex)
+                pass
 
     def parse_folder_npy(self, dataset_path='./dataset'):
 

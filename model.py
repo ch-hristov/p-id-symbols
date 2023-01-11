@@ -7,6 +7,9 @@ class VisualObject:
         self.start_xy = start_xy
         self.end_xy = end_xy
 
+    def get_category(self):
+        pass
+
 class OtherLine:
     def __init__(self, start_xy: List[float], end_xy: List[float], isOne: int):
         self.start_xy = start_xy
@@ -118,16 +121,18 @@ class PID:
                                                                          len(self.words),
                                                                          len(self.table))
 
-class Symbol:
+class Symbol(VisualObject):
     def __init__(self, symbol_id: str, rect_start_xy: List[int], rect_end_xy: List[int], label: str, pid: PID):
+        VisualObject.__init__(self, rect_start_xy, rect_end_xy)
         self.symbol_id = symbol_id
-        self.start_xy = rect_start_xy
-        self.end_xy = rect_end_xy
         self.label = label
         self.pid = pid
 
     def __repr__(self) -> str:
         return str(self.symbol_id)
+
+    def get_category(self):
+        return self.label
 
 class Line(VisualObject):
     def __init__(self, line_id: str, start_xy: List[float], end_xy: List[float], tag: str, types: str, pid : PID):
@@ -139,3 +144,6 @@ class Line(VisualObject):
 
     def __repr__(self) -> str:
         return str(self.line_id)
+    
+    def get_category(self):
+        return self.types
