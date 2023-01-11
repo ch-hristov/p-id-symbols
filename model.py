@@ -13,6 +13,7 @@ class VisualObject:
     def get_label(self):
         pass
 
+
 class OtherLine:
     def __init__(self, start_xy: List[float], end_xy: List[float], isOne: int):
         self.start_xy = start_xy
@@ -23,6 +24,7 @@ class OtherLine:
 class Table:
     def __init__(self):
         self.lines = []
+
 
 class Word(VisualObject):
     def __init__(self, word_id: str, start_xy: List[int], end_xy: List[int], text: str, value: int):
@@ -106,10 +108,10 @@ class PID:
         return output
 
     def __init__(self):
-        self.symbols : List[Symbol] = []
-        self.lines : List[Line] = []
-        self.words : List[Word] = []
-        self.table : Table = []
+        self.symbols: List[Symbol] = []
+        self.lines: List[Line] = []
+        self.words: List[Word] = []
+        self.table: Table = []
         self.links = []
         self.details = []
         self.otherLines = []
@@ -123,6 +125,7 @@ class PID:
                                                                          len(self.lines),
                                                                          len(self.words),
                                                                          len(self.table))
+
 
 class Symbol(VisualObject):
     def __init__(self, symbol_id: str, rect_start_xy: List[int], rect_end_xy: List[int], label: str, pid: PID):
@@ -140,8 +143,9 @@ class Symbol(VisualObject):
     def get_label(self):
         return self.label
 
+
 class Line(VisualObject):
-    def __init__(self, line_id: str, start_xy: List[float], end_xy: List[float], tag: str, types: str, pid : PID):
+    def __init__(self, line_id: str, start_xy: List[float], end_xy: List[float], tag: str, types: str, pid: PID):
         VisualObject.__init__(self, start_xy, end_xy)
         self.line_id = line_id
         self.types = types
@@ -150,7 +154,7 @@ class Line(VisualObject):
 
     def __repr__(self) -> str:
         return str(self.line_id)
-    
+
     def get_category(self):
         return self.types
 

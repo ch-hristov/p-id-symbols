@@ -97,14 +97,18 @@ class PIDParser:
 
         return top_x / img_size[0], top_y / img_size[1], abs(width) / img_size[0], abs(height) / img_size[1]
 
-    def generate_line_labels(self,
+    def generate_labels(self,
                              pid_list: List[model.PID],
                              save_img_path: str,
                              labels_path: str,
                              visual_objects: dict[str, list[model.VisualObject]],
-                             img_size=1280):
+                             img_size=1280,
+                             is_test: bool = True):
 
         all_images = os.listdir("./images")
+
+        if is_test:
+            all_images = os.listdir("test_images")
 
         for img in all_images:
             spl = img.split('_')
@@ -169,8 +173,9 @@ class PIDParser:
                         file_object.write("\n")
                     # Append text at the end of file
                     file_object.write(next)
-
-            # self.render_samples(pid_original, img_x_start, img_y_start, img_x_end, img_y_end, all_data)
+            if is_test:
+                self.render_samples(pid_original, img_x_start,
+                                    img_y_start, img_x_end, img_y_end, all_data)
 
     def render_samples(self, pid_original, img_x_start, img_y_start, img_x_end, img_y_end, all_data):
         im = Image.open(pid_original.path)

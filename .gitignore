@@ -6,3 +6,5 @@
 /dataset
 /__pycache__
 .DS_Store
+/symbol_labels
+/symbol_images
