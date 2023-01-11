@@ -104,7 +104,7 @@ class PIDParser:
                              visual_objects: dict[str, list[model.VisualObject]],
                              img_size=1280):
 
-        all_images = os.listdir("./images")
+        all_images = os.listdir("./test_images")
 
         for img in all_images:
             spl = img.split('_')
@@ -169,25 +169,33 @@ class PIDParser:
                     # Append text at the end of file
                     file_object.write(next)
 
-            # self.render_samples(pid_original, img_x_start, img_y_start, img_x_end, img_y_end, all_data)
+            self.render_samples(pid_original, img_x_start, img_y_start, img_x_end, img_y_end, all_data)
 
     def render_samples(self, pid_original, img_x_start, img_y_start, img_x_end, img_y_end, all_data):
         im = Image.open(pid_original.path)
         fig, ax = plt.subplots()
 
-        fig.set_size_inches(15, 15)
+        fig.set_size_inches(30, 30)
         rect = patches.Rectangle((img_x_start, img_y_start), img_y_end - img_y_start, img_x_end-img_x_start,
-                                 fill=None, alpha=1)
+                                 fill=None, alpha=1, color = 'red')
         ax.add_artist(rect)
+        i = 1
+        import random
+
+        number_of_colors = 8
+
         for coord in all_data:
+            color = ["#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
+             for i in range(number_of_colors)]
+
             rect = patches.Rectangle((coord[0], coord[1]), coord[2]+3-coord[0], coord[3]+3-coord[1],
-                                     linewidth=2, label=coord[4])
+                                     linewidth=2, label=coord[4], color = color[0])
 
             ax.add_artist(rect)
             rx, ry = rect.get_xy()
             cx = rx + rect.get_width()
             cy = ry + rect.get_height()
-
+            i = i + 1
             # ax.annotate(coord[4], (cx, cy), color='blue', weight='bold',
             #             fontsize=20)
         ax.imshow(im)
