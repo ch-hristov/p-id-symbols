@@ -89,11 +89,11 @@ class PIDParser:
         if (height < 0):
             top_y = bot_y
 
-        if width < 10:
-            width = 10
+        # if width < 10:
+        #     width = 10
 
-        if height < 10:
-            height = 10
+        # if height < 10:
+        #     height = 10
 
         return top_x / img_size[0], top_y / img_size[1], abs(width) / img_size[0], abs(height) / img_size[1]
 
