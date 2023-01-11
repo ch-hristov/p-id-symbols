@@ -64,13 +64,6 @@ class PIDParser:
             return True
         return False
 
-    def to_label(self, type: str):
-        if type == 'solid':
-            return 0
-        if type == 'dashed':
-            return 1
-        return 2
-
     def normalized_coords(self, start_xy: List[float], end_xy: List[float],
                           img_start: List[float],
                           img_size: List[float]):
@@ -96,10 +89,10 @@ class PIDParser:
         if (height < 0):
             top_y = bot_y
 
-        if width < 10:
+        if width < 50:
             width = 50
 
-        if height < 10:
+        if height < 650:
             height = 50
 
         return top_x / img_size[0], top_y / img_size[1], abs(width) / img_size[0], abs(height) / img_size[1]
@@ -116,7 +109,7 @@ class PIDParser:
         for img in all_images:
             spl = img.split('_')
             pid_id = spl[0]
-
+            pid_original = [pid for pid in pid_list if pid.id == pid_id][0]
             # gather the boundires of the image
             horizontal = float(spl[2].replace('.jpg', ""))
             vertical = float(spl[1])
@@ -150,7 +143,7 @@ class PIDParser:
                     name, format_label))
 
                 next = '{0} {1} {2} {3} {4}'.format(
-                    self.to_label(obj.get_category()),
+                    obj.get_label(),
                     *self.normalized_coords(
                         obj.start_xy,
                         obj.end_xy,

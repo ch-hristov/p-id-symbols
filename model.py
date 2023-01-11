@@ -10,6 +10,9 @@ class VisualObject:
     def get_category(self):
         pass
 
+    def get_label(self):
+        pass
+
 class OtherLine:
     def __init__(self, start_xy: List[float], end_xy: List[float], isOne: int):
         self.start_xy = start_xy
@@ -134,6 +137,9 @@ class Symbol(VisualObject):
     def get_category(self):
         return self.label
 
+    def get_label(self):
+        return self.label
+
 class Line(VisualObject):
     def __init__(self, line_id: str, start_xy: List[float], end_xy: List[float], tag: str, types: str, pid : PID):
         VisualObject.__init__(self, start_xy, end_xy)
@@ -147,3 +153,10 @@ class Line(VisualObject):
     
     def get_category(self):
         return self.types
+
+    def get_label(self):
+        if self.types == 'solid':
+            return 0
+        if self.types == 'dashed':
+            return 1
+        return 2
